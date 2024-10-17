@@ -314,7 +314,7 @@ La conclusiones son las mismas que en la anterior imagen, pero en este caso se h
 
 ## Conclusión
 
-Este proyecto se ha visto cómo utilizar YOLOv5 para la detección de personas en imágenes de manera eficiente y con alta precisión. La simplicidad de la implementación, gracias a PyTorch y al repositorio de Ultralytics, nos ha permitido obtener resultados precisos con poco código (muy útil para el mantenimiento en producción).
+Con este ejemplo hemos visto cómo utilizar los modelos de YOLO para la detección de personas en imágenes de manera eficiente y con alta precisión. La simplicidad de la implementación, gracias a PyTorch y al repositorio de Ultralytics, nos ha permitido obtener resultados precisos con poco código (muy útil para el mantenimiento en producción).
 
 ## Referencias
 
