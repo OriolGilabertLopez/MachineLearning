@@ -296,21 +296,21 @@ for img_path in random_images:
 
 Al ejecutar el código, el modelo detecta y cuenta el número de personas en cada una de las imágenes seleccionadas aleatoriamente. Para poner un ejemplo, esta seria la salida de las dos pirmeras imagenes procesadas:
 
-![Ejemplo de detección 1](https://github.com/OriolGilabertLopez/MachineLearning/blob/bb4ec3f11bc05992053716901f5d21501467611c/Projects/MachineLearning/ImageDetection/YoloImages/image1.png)
+![Ejemplo de detección 1](https://github.com/OriolGilabertLopez/MachineLearning/blob/e6b500eadde987ed8f18aa15be4cd49e8089cc79/Projects/MachineLearning/ImageDetection/YoloImages/image1.png)
 
 En esta imagen del centro comercial,  se han detectado con éxito **21 personas**. Los cuadros rojos alrededor de cada persona representan las detecciones realizadas por el modelo **YOLOv5**, acompañadas de su correspondiente porcentaje de confianza. 
 
 Lo que podemos ver que es que:
 - La mayoría de las detecciones tienen niveles de confianza elevados, con varios cuadros superando el **70%** de confianza, lo que demuestra la eficacia del modelo en identificar personas en diversos escenarios.
 - El modelo es capaz de detectar personas a diferentes distancias y en distintas áreas del centro comercial, desde el fondo hasta el primer plano, mostrando un rendimiento consistente.
-- Incluso en áreas más concurridas, YOLOv5 logra identificar múltiples personas cercanas sin perder precisión, lo cual es ideal para aplicaciones en ambientes con multitudes.
+- Incluso en áreas más concurridas, con YOLOv5 hemos  logrado identificar múltiples personas cercanas sin perder precisión, lo cual es ideal para aplicaciones en ambientes con multitudes.
 
-Este resultado reafirma la capacidad de YOLOv5 para manejar entornos complejos y variados, manteniendo un alto nivel de precisión en la detección de personas.
+Este resultado muestra el potencia de YOLOv5 para manejar entornos complejos y variados, manteniendo un alto nivel de precisión en la detección de personas.
 
 
-![Ejemplo de detección 1](https://github.com/OriolGilabertLopez/MachineLearning/blob/bb4ec3f11bc05992053716901f5d21501467611c/Projects/MachineLearning/ImageDetection/YoloImages/image2.png))
+![Ejemplo de detección 2](https://github.com/OriolGilabertLopez/MachineLearning/blob/e6b500eadde987ed8f18aa15be4cd49e8089cc79/Projects/MachineLearning/ImageDetection/YoloImages/image2.png)
 
-La conclusiones son las mismas que en la anterior imagen, pero en este caso se han detectado **21 personas**
+La conclusiones son las mismas que en la anterior imagen, pero en este caso se han detectado **19 personas**
 
 ## Conclusión
 
