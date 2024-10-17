@@ -6,20 +6,20 @@ La detección de objetos es un campo fundamental de la Computer Vision, con apli
 
 ## ¿Qué es YOLOv5?
 
-**YOLOv5** (You Only Look Once version 5) es una versión mejorada de la familia de modelos YOLO para la detección de objetos. YOLO, principalmente se caracteriza por su capacidad para realizar detecciones de objetos con alta precisión. A diferencia de otros métodos que requieren múltiples pasadas sobre una imagen, YOLO predice las coordenadas de los cuadros delimitadores y las clases de los objetos en una sola pasada, lo que lo hace extremadamente eficiente.
+**YOLOv5** (You Only Look Once version 5) es una versión mejorada de la familia de modelos YOLO (más info [aquí](https://github.com/ultralytics/yolov5)) para la detección de objetos. YOLO, principalmente se caracteriza por su capacidad para realizar detecciones de objetos con alta precisión. A diferencia de otros métodos que requieren múltiples pasadas sobre una imagen, YOLO predice las coordenadas de los cuadros delimitadores y las clases de los objetos en una sola pasada, lo que lo hace extremadamente eficiente y fácil de implementar.
 
 ## Objetivo del Proyecto
 
-El objetivo de este proyecto es, a parte de aprender a usar YOLO, a como:
+El objetivo de este proyecto es, a parte de aprender a usar YOLO, ver como podemos:
 - Implementar un detector de personas utilizando el modelo preentrenado YOLOv5.
-- Aplicar el detector a un conjunto de imágenes y contar el número de personas en cada imagen.
+- Aplicar un detector a un conjunto de imágenes y contar el número de personas en cada imagen (se pueden contar animales, etc...).
 - Visualizar los resultados mostrando los cuadros delimitadores y el conteo total de personas detectadas.
 
 ## Metodología
 
 ### Requisitos Previos
 
-A día hoy, Julio de 2024, los requisitos previos quedan tal que así:
+A día hoy, a Julio de 2024, los requisitos previos quedan tal que así:
 - **Python 3.6** o superior.
 - **PyTorch**: Biblioteca de Deep Learning que nos proporciona soporte para la implementación y entrenamiento de modelos.
 - **OpenCV**: Librería para procesamiento de imágenes y visión por computadora.
@@ -27,7 +27,7 @@ A día hoy, Julio de 2024, los requisitos previos quedan tal que así:
 
 ### Instalación de Dependencias
 
-Asegúrate de tener instaladas las siguientes librerías:
+Debemos asegurarnos de tener instaladas las siguientes librerías:
 
 ```bash
 pip install torch torchvision
@@ -42,126 +42,270 @@ Utilizamos el repositorio oficial de [Ultralytics](https://docs.ultralytics.com/
 ```python
 import torch
 
-model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
+model = torch.hub.load('ultralytics/yolov5', 'yolov5m', pretrained=True)
 ```
+
+En el repositorio de **YOLOv5** de **Ultralytics**, se proporcionan diferentes versiones del modelo preentrenado, cada una optimizada para un equilibrio distinto entre **velocidad** y **precisión**. Las versiones disponibles son:
+
+- **yolov5s (small)**: La versión más pequeña y rápida, pero menos precisa.
+- **yolov5m (medium)**: Una versión intermedia entre velocidad y precisión.
+- **yolov5l (large)**: Más grande y más precisa, pero más lenta.
+- **yolov5x (extra large)**: La versión más grande, más precisa, pero también la más lenta.
+
+Para nuestro ejemplo, usaremsos `yolov5m` dado que este nos ofrece un equilibrio óptimo entre tamaño, velocidad y precisión, lo cual es ideal para nosotros. Incluso para soluciones comerciales que requieren detección en tiempo casi real, `yolov5m` es un buen modelo gracias a su buen rendimiento.
+
 
 ### Explicación Código Completo
 
-A continuación, se presenta el código completo con comentarios que explican cada sección.
+A continuación, vamos a ver el código completo con comentarios que explican cada sección
+
+#### Entrorno de ejecución:
+
+Procedemos a comprbar que el entorno de ejecucion del modelo es el correcto
+
 
 ```python
 import sys
+print('Entorno actual:', sys.executable)
+```
+Salida:
+```
+Entorno actual: c:\Users\usuario\AppData\Local\anaconda3\envs\env_YOLO_model\python.exe
+
+```
+Nos aseguramos que los **warnings** no salgan (¡cuidado con esto!)
+
+```python
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
+```
+Con esto vamos a suprimimos las advertencias de funciones obsoletas, lo cual para una presentacion visual es lo más correcto.
+
+#### Comprobación de las versiones de PyTorch y OpenCV:
+
+```python
 import torch
 import cv2
-import matplotlib.pyplot as plt
-import random
-import os
-import warnings
-
-# Suprimimos las advertencias de funciones obsoletas (ojo con esto!)
-warnings.filterwarnings('ignore', category=FutureWarning)
 
 print('Entorno activado actual:', sys.executable)
 print('Torch-version:\t', torch.__version__)
 print('OpenCV-version:\t', cv2.__version__)
+```
+Salida:
+```
+Torch-version:	 2.5.0
+OpenCV-version:	 4.10.0
+```
 
-# Verificar si CUDA está disponible (por si podemos usar GPU en vez de CPU)
+Ahora, verificamos si `CUDA` está disponible (por si podemos usar GPU en vez de CPU)
+```python
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f"\nUsando el dispositivo: {device.upper()}")
+```
+Salida:
+```
+Usando el dispositivo: CPU
+```
 
-# Ruta al archivo zip del conjunto de datos y ruta de extracción (me lo he descargado en un zip)
+#### Importacion de los datos:
+
+Ahora, definimos la ruta al archivo zip del conjunto de datos de **Mall** y la ruta de extracción donde se guardaran los frames
+```python
 zip_file_path = 'C:/ruta/al/archivo/mall_dataset.zip'
 extract_path = 'C:/ruta/de/extraccion/'
+```
 
-# Extraemos el archivo zip (descomentar en la primera ejecución)
-# import zipfile
-# with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-#     zip_ref.extractall(extract_path)
+y, como nos lo hemos descargado con fomrato .zip, debemos descomprimir el archivo
 
-# Ruta a las imagenes extraidas
+```python
+import zipfile
+with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+    zip_ref.extractall(extract_path)
+```
+
+creamos una ruta completa hacia el directorio que contiene los frames del conjunto de datos, asegurandonos de que los separadores de directorio sean correctos para el sistema.
+
+```python
+import os
 path_frames = os.path.join(extract_path, 'mall_dataset', 'frames')
+```
 
-# Lista de los archivos con imágenes
+Ahora, vamos a recorrer el directorio `path_frames` (y sus subdirectorios) y almacenamos en una lista todos los archivos con extensión `.jpg` 
+```python
 extracted_files = []
 for root, dirs, files in os.walk(path_frames):
     for file in files:
         if file.endswith(".jpg"):
             extracted_files.append(os.path.join(root, file))
+```
 
-print(f"Número de imágenes extraídas: {len(extracted_files)}")
-# Cargar el modelo YOLOv5 preentrenado
-model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+Contenido de `extracted_files` seria este:
+```
+['..../output/mall_dataset/frames/seq_000001.jpg',
+ '..../output/mall_dataset/frames/seq_000002.jpg',
+ '..../output/mall_dataset/frames/seq_000003.jpg',
+ '..../output/mall_dataset/frames/seq_000004.jpg',
+ '..../output/mall_dataset/frames/seq_000005.jpg',
+...
+]
+```
+Y, de todas estas, solo seleccionamos 10 al azar para ilustrar este ejemplo:
 
-# Selección de  10 imágenes aleatorias
+```python
+ import random
 random_images = random.sample(extracted_files, 10)
+```
+
+#### Carga del modelo `YOLOv5m`
+
+```python
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+```
+Salida:
+
+```
+Using cache found in C:\Users\usuario/.cache\torch\hub\ultralytics_yolov5_master
+YOLOv5  2024-10-17 Python-3.12.7 torch-2.5.0 CPU
+
+Fusing layers... 
+YOLOv5m summary: 290 layers, 21172173 parameters, 0 gradients, 48.9 GFLOPs
+Adding AutoShape... 
+```
+
+#### Definición de la funcón principal: `detect_and_display(image_path)`:
+
+La función `detect_and_display(image_path)` es una implementación diseñada para procesar imágenes y realizar la detección de personas utilizando el modelo preentrenado YOLOv5. El objetivo principal es identificar todas las personas de las 10 imagenes dadas (o las que sean), resaltar su presencia con cuadros delimitadores, y mostrar el nivel de confianza del modelo para cada detección.
+
+
+```python
+
+import matplotlib.pyplot as plt
 
 # Creamos una función para detectar y mostrar resultados de YOLO
 def detect_and_display(image_path):
-
-    # Leemos la imagen
+    # Cargamos la imagen desde el archivo
     img = cv2.imread(image_path)
-    if img is None:
-        print(f"Error al leer la imagen: {image_path}")
-        return
 
-    # Realizamos predicciones
+    # Realizamos las predicciones con el modelo YOLOv5
     results = model(img)
 
-    # Obtenemos las detecciones de personas
+    # Filtramos las detecciones para quedarnos solo con las personas
     detections = results.pandas().xyxy[0]
     people_detections = detections[detections['name'] == 'person']
 
-    # Contamos las personas detectadas
+    # Contamos cuántas personas se detectaron en la imagen
     total_people = len(people_detections)
 
-    # Dibujanos cuadros reojos alrededor de cada persona
-    for _, row in people_detections.iterrows():
-        x_min = int(row['xmin'])
-        y_min = int(row['ymin'])
-        x_max = int(row['xmax'])
-        y_max = int(row['ymax'])
+    # Dibujamos cuadros rojos alrededor de cada persona detectada y añadimos el porcentaje de confianza
+    for i, row in people_detections.iterrows():
+        x_min, y_min, x_max, y_max = int(row['xmin']), int(row['ymin']), int(row['xmax']), int(row['ymax'])
+        confidence = row['confidence'] * 100  # Convertimos la confianza a porcentaje
+        label = f'{confidence:.1f}%'  # Mostramos solo el porcentaje de confianza (ej. "98.5%")
+
+        # Dibujamos el cuadro rojo alrededor de la persona
         cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
 
-    # Añadimos el texto con el conteo total
-    text = f'Personas detectadas: {total_people}'
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    cv2.putText(img, text, (10, 35), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        # Configuramos el texto para mostrar la confianza
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 0.5  # Reducimos el tamaño del texto
+        font_thickness = 1  # Hacemos el texto más fino
+        text_color = (255, 255, 255)  # Color blanco para el texto
+        text_bg_color = (0, 0, 255)  # Fondo rojo detrás del texto
+        text_size, _ = cv2.getTextSize(label, font, font_scale, font_thickness)
+        text_w, text_h = text_size
 
-    # Mostramos la imagen
+        # Dibujamos el fondo rojo para el texto justo por encima del cuadro
+        cv2.rectangle(img, (x_min, y_min - text_h - 5), (x_min + text_w, y_min), text_bg_color, -1)
+
+        # Añadimos el texto con la confianza sobre el cuadro
+        cv2.putText(img, label, (x_min, y_min - 5), font, font_scale, text_color, font_thickness)
+
+    # Añadimos el número total de personas detectadas en la parte superior de la imagen
+    total_text = f'Personas detectadas: {total_people}'
+    total_font = cv2.FONT_HERSHEY_SIMPLEX
+    total_font_scale = 0.9  # Ajustamos el tamaño del texto del total
+    total_font_thickness = 2  # Ajustamos el grosor del texto del total
+    total_text_color = (255, 255, 255)  # Texto blanco
+    total_text_bg_color = (0, 0, 255)  # Fondo rojo para el texto del total
+    total_text_size, _ = cv2.getTextSize(total_text, total_font, total_font_scale, total_font_thickness)
+    total_text_w, total_text_h = total_text_size
+
+    # Dibujamos el fondo rojo para el texto del total de personas
+    cv2.rectangle(img, (10, 10), (10 + total_text_w, 10 + total_text_h + 10), total_text_bg_color, -1)
+
+    # Colocamos el texto del total de personas en la imagen
+    cv2.putText(img, total_text, (10, 30 + total_text_h // 2), total_font, total_font_scale, total_text_color, total_font_thickness)
+
+    # Mostramos la imagen con las detecciones
     plt.figure(figsize=(10, 10))
     plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     plt.axis('off')
     plt.show()
 
-# Aplicamos la función a las imágenes seleccionadas
+# Realizamos predicciones para 10 imágenes seleccionadas al azar
 for img_path in random_images:
     detect_and_display(img_path)
+
 ```
 
-### Explicación del Código
+### Explicación del Código de forma más detallada:
 
-- **Carga de librerías**: Importamos las librerías necesarias y suprimimos advertencias innecesarias para mantener la salida limpia.
-- **Configuración del dispositivo**: Verificamos si hay una GPU disponible para utilizar CUDA y acelerar el procesamiento.
-- **Carga del conjunto de datos**: Especificamos la ruta al conjunto de datos (en este caso, el "Mall Dataset") y listamos todas las imágenes disponibles.
-- **Carga del modelo**: Utilizamos `torch.hub` para cargar el modelo YOLOv5 preentrenado, lo que nos evita tener que entrenar el modelo desde cero.
-- **Función `detect_and_display`**: Esta función realiza las siguientes tareas:
-  - **Lectura de la imagen**: Utiliza OpenCV para leer la imagen desde la ruta proporcionada.
-  - **Predicciones**: Pasa la imagen al modelo YOLOv5 para obtener las detecciones.
-  - **Filtrado de detecciones**: Solo mantenemos las detecciones que corresponden a personas.
-  - **Conteo y visualización**: Contamos el número de personas detectadas, dibujamos cuadros delimitadores alrededor de ellas y añadimos un texto con el conteo total.
-  - **Visualización**: Utilizamos Matplotlib para mostrar la imagen resultante.
-- **Aplicación de la función**: Iteramos sobre una muestra aleatoria de imágenes y aplicamos la función `detect_and_display` a cada una.
+- **Carga de librerías**: 
+  - Importamos las librerías necesarias como `matplotlib` para la visualización de imágenes, `random` para la selección de imágenes aleatorias, `cv2` para la manipulación de imágenes con OpenCV, y `torch` para el modelo YOLOv5.
+  
+- **Configuración del dispositivo**: 
+  - Verificamos si el sistema tiene disponible una **GPU con CUDA** para acelerar el procesamiento. Si no hay GPU, se utiliza la CPU. Esto permite que el código sea flexible y se ejecute en diferentes configuraciones de hardware.
+
+- **Carga del conjunto de datos**: 
+  - Especificamos la ruta donde se encuentran las imágenes del **Mall Dataset**, extraemos las rutas de los archivos JPG de los frames, y los almacenamos en una lista llamada `extracted_files`.
+
+- **Carga del modelo**: 
+  - Utilizamos `torch.hub` para cargar el modelo **YOLOv5 preentrenado**. Esto nos permite usar un modelo que ya ha sido entrenado en el conjunto de datos COCO para detectar múltiples clases de objetos, incluida la clase "persona". Al usar este modelo preentrenado, no es necesario entrenar el modelo desde cero, lo que ahorra mucho tiempo.
+
+- **Función `detect_and_display`**: 
+  - Esta función se encarga de realizar las detecciones y mostrar las imágenes con los resultados. Aquí hay un desglose de sus partes:
+  
+  - **Lectura de la imagen**: 
+    - Usamos **OpenCV (`cv2.imread`)** para leer las imágenes desde las rutas de los archivos. Esta es una forma eficiente de manejar las imágenes en formato JPG.
+
+  - **Predicciones con YOLOv5**: 
+    - Una vez leída la imagen, la pasamos al modelo YOLOv5 para hacer las predicciones. El modelo devolverá múltiples detecciones de objetos, pero filtraremos para quedarnos solo con las detecciones de personas.
+
+  - **Filtrado de detecciones**: 
+    - Después de obtener todas las predicciones, filtramos las que pertenecen a la clase "persona" (`detections['name'] == 'person'`). De esta manera, solo nos interesa dibujar cuadros alrededor de las personas y no de otros objetos.
+
+  - **Conteo de personas**: 
+    - Contamos cuántas personas fueron detectadas y almacenamos este número en `total_people`. Este valor se muestra al final de cada imagen en la parte superior.
+
+  - **Dibujo de cuadros delimitadores**: 
+    - Para cada persona detectada, dibujamos un **cuadro rojo** alrededor de su posición en la imagen usando `cv2.rectangle()`. Estos cuadros delimitadores marcan visualmente las detecciones del modelo.
+  
+  - **Añadir confianza (precisión)**:
+    - Junto al cuadro delimitador, añadimos un texto que indica el **porcentaje de confianza** del modelo en esa detección. Esto ayuda a evaluar qué tan seguro está el modelo de que el objeto detectado es una persona. El porcentaje de confianza se muestra con un texto en blanco sobre un fondo rojo, ubicado justo por encima del cuadro.
+
+  - **Mostrar el conteo total**:
+    - En la parte superior izquierda de la imagen, añadimos un texto que muestra el número total de personas detectadas en esa imagen (`total_people`). Este texto también se coloca sobre un fondo rojo para asegurar una buena visibilidad.
+
+  - **Visualización**: 
+    - Una vez que se han dibujado los cuadros y el texto, usamos **Matplotlib** para mostrar la imagen resultante. Esto nos permite visualizar el resultado final, con los cuadros y las etiquetas de confianza claramente visibles.
+
+- **Aplicación de la función**: 
+  - Iteramos sobre una muestra aleatoria de 10 imágenes seleccionadas de `extracted_files` y aplicamos la función `detect_and_display` a cada una. Esto nos permite ver las detecciones y el conteo de personas en varias imágenes diferentes de forma rápida.
 
 ## Resultados
 
-Al ejecutar el código, el modelo detecta y cuenta el número de personas en cada una de las imágenes seleccionadas aleatoriamente. A continuación mostramos dos ejemplos de las detecciones realizadas:
+Al ejecutar el código, el modelo detecta y cuenta el número de personas en cada una de las imágenes seleccionadas aleatoriamente. Para poner un ejemplo, esta seria la salida de las dos pirmeras imagenes procesadas:
 
 ![Ejemplo de detección 1](https://github.com/OriolGilabertLopez/MachineLearning/blob/bb4ec3f11bc05992053716901f5d21501467611c/Projects/MachineLearning/ImageDetection/YoloImages/image1.png)
 
-En la primera imagen se muestra el centro comercial del conjuto de datos de *Mall Dataset*, donde se han detectado **16 personas**. Los cuadros rojos alrededor de las personas nos indican las detecciones realizadas por el modelo YOLOv5. A continuación podem sacar las siguientes conclusiones:
+En esta imagen del centro comercial,  se han detectado con éxito **21 personas**. Los cuadros rojos alrededor de cada persona representan las detecciones realizadas por el modelo **YOLOv5**, acompañadas de su correspondiente porcentaje de confianza. 
 
-- **Detección de personas**: El modelo ha detectado correctamente a varias personas distribuidas en el área visible de la imagen. Esto incluye personas caminando tanto en primer plano como en el fondo.
-- **Precisión de los cuadros delimitadores**: Los cuadros rojos abarcan a las personas detectadas en su mayoría con precisión. Algunas personas en el fondo o parcialmente cubiertas han sido detectadas, lo cual es un buen indicador del rendimiento del modelo.
+Lo que podemos ver que es que:
+- La mayoría de las detecciones tienen niveles de confianza elevados, con varios cuadros superando el **70%** de confianza, lo que demuestra la eficacia del modelo en identificar personas en diversos escenarios.
+- El modelo es capaz de detectar personas a diferentes distancias y en distintas áreas del centro comercial, desde el fondo hasta el primer plano, mostrando un rendimiento consistente.
+- Incluso en áreas más concurridas, YOLOv5 logra identificar múltiples personas cercanas sin perder precisión, lo cual es ideal para aplicaciones en ambientes con multitudes.
+
+Este resultado reafirma la capacidad de YOLOv5 para manejar entornos complejos y variados, manteniendo un alto nivel de precisión en la detección de personas.
 
 
 ![Ejemplo de detección 1](https://github.com/OriolGilabertLopez/MachineLearning/blob/bb4ec3f11bc05992053716901f5d21501467611c/Projects/MachineLearning/ImageDetection/YoloImages/image2.png))
