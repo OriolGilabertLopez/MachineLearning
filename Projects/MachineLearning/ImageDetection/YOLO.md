@@ -2,7 +2,7 @@
 
 ## Introducción
 
-La detección de objetos es un campo fundamental en visión por computadora (computer vision), con aplicaciones que van desde la seguridad o auditorias hasta la conducción autónoma. En particular, la detección de personas es crucial para sistemas de vigilancia o análisis de multitudes. En este mini proyecto, vamos a implementar un detector de personas utilizando **YOLOv5**, uno de los algoritmos de detección de objetos *en tiempo real* más avanzados y accesibles del mundo. Este lo vamos a aplicar a un conjunto de imágenes para contar el número de personas presentes en cada una.
+La detección de objetos es un campo fundamental de la Computer Vision, con aplicaciones que van desde la seguridad o auditorias hasta la conducción autónoma de vehículos (RoboTaxi de Tesla es un claro ejemplo). En particular, la detección de personas es crucial para sistemas de vigilancia o análisis de multitudes. En este mini proyecto, implementamos un detector de personas utilizando **YOLOv5**, uno de los algoritmos de detección de objetos *en tiempo real* más avanzados y accesibles del mundo. Éste lo vamos a aplicar a un conjunto de imágenes (datos: [Mall Dataset](https://personal.ie.cuhk.edu.hk/~ccloy/downloads_mall_dataset.html)) para contar el número de personas presentes en cada una.
 
 ## ¿Qué es YOLOv5?
 
