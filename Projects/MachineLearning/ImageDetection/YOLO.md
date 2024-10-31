@@ -294,14 +294,13 @@ Al ejecutar el código, el modelo nos va a detectar y contar el número de perso
 
 ![Ejemplo de detección 1](https://github.com/OriolGilabertLopez/MachineLearning/blob/e6b500eadde987ed8f18aa15be4cd49e8089cc79/Projects/MachineLearning/ImageDetection/YoloImages/image1.png)
 
-En esta imagen del centro comercial,  se han detectado con éxito **21 personas**. Los cuadros rojos alrededor de cada persona representan las detecciones realizadas por el modelo **YOLOv5**, acompañadas de su correspondiente porcentaje de confianza. 
+En esta imagen (aleatoria) del centro comercial, el modelo ha detectado con éxito **21 personas** 
 
 Lo que podemos ver que es que:
 - La mayoría de las detecciones tienen niveles de confianza elevados, con varios cuadros superando el **70%** de confianza, lo que demuestra la eficacia del modelo en identificar personas en diversos escenarios.
-- El modelo es capaz de detectar personas a diferentes distancias y en distintas áreas del centro comercial, desde el fondo hasta el primer plano, mostrando un rendimiento consistente.
-- Incluso en áreas más concurridas, con YOLOv5 hemos  logrado identificar múltiples personas cercanas sin perder precisión, lo cual es ideal para aplicaciones en ambientes con multitudes.
+- El modelo es capaz de detectar personas a diferentes distancias y en distintas áreas del centro comercial, desde el fondo hasta el primer plano, lo cual permite afirmar que tiene un rendimiento consistente.
 
-Este resultado muestra el potencia de YOLOv5 para manejar entornos complejos y variados, manteniendo un alto nivel de precisión en la detección de personas.
+Basicamente el resultado nos muestra el potencial de YOLOv5 para usarlo en entornos complejos y variados, ya que nos mantiene un alto nivel de precisión.
 
 
 ![Ejemplo de detección 2](https://github.com/OriolGilabertLopez/MachineLearning/blob/e6b500eadde987ed8f18aa15be4cd49e8089cc79/Projects/MachineLearning/ImageDetection/YoloImages/image2.png)
@@ -310,7 +309,7 @@ La conclusiones son las mismas que en la anterior imagen, pero en este caso se h
 
 ## Conclusión
 
-Con este ejemplo hemos visto cómo utilizar los modelos de YOLO para la detección de personas en imágenes de manera eficiente y con alta precisión. La simplicidad de la implementación, gracias a PyTorch y al repositorio de Ultralytics, nos ha permitido obtener resultados precisos con poco código (muy útil para el mantenimiento en producción).
+Con este ejemplo hemos visto cómo utilizar los modelos de YOLO de ultralytics para la detección de personas de una forma sencilla, eficiente y con alta precisión con Python. 
 
 ## Referencias
 
